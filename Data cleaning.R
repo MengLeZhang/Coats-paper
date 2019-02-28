@@ -74,6 +74,16 @@ more.na <- cleaned.sal$Var1 %>% subset(cleaned.sal$is_na == T)
 more.na
 wages.long %>% filter(salary == 'enlisted') # we can see that
 
+## Enlistment
+test <- 
+  wages.long %>%
+#  group_by(ID) %>%
+  mutate(enlist_year = ifelse(salary == 'enlisted', year, NA)) %>%
+  group_by(ID) %>%
+  mutate(first_year = enlist_year %>% min(na.rm = T),
+         salary.test = ifelse(is.na(salary) & (year > first_year & year < 1920),
+                              'enlisted', salary)) #%>%
+test %>% filter(ID == 33) %>% tail
 
 ##  Then create not.recorded and filter out NA from wages.long
 wages.long$not.recorded <- is.na(wages.long$salary)
