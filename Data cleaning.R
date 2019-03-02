@@ -122,7 +122,8 @@ wages.long <- wages.long %>% subset(not.recorded == F) # restrict to only record
 ##  Table of first pay and commenced
 check.begin <- aggregate(year ~ Name + ID + Commenced, wages.long, min)
 check.begin #interesting 
-check.begin$diff <- check.begin$year - check.begin$Commenced # many cases where
+check.begin$diff <- 
+  check.begin$year - check.begin$Commenced # many cases where
 ## the first year they commenced is not the first year they had a recorded sal
 
 check.begin$diff %>% table # most cases are only 1 or 2 year out which shouldn't
@@ -138,8 +139,9 @@ check.begin$base2 <- check.begin$base1
 check.begin$base2[!(pre.coats | {abs(check.begin$diff) <= 4})] <- NA #189 records
 
 ##  Add the base1 and base2 variable (as well as diff) to the longcoats
-wages.long <- wages.long %>% 
-  merge(check.begin[, c('ID', 'diff', 'base1', 'base2')], by = 'ID')
+wages.long <- 
+  wages.long %>% 
+  left_join(check.begin[, c('ID', 'diff', 'base1', 'base2')], by = 'ID')
 
 ##  Step six: Caclulate tenure variables
 ##  Tenure is a count of how many years of service plus their base
@@ -158,12 +160,12 @@ wages.long$tenure2 <- wages.long$tenure.count + wages.long$base2
 ##  Step 7: Now turn the salary variable into a numeric variable which is cost of ----
 ##  living adjusted salary
 
-f.index<-read.csv('Data/Coats Mar 2017/F index.csv',na.strings =c('','NA'), stringsAsFactors = F  )
+f.index<-read.csv('Raw data/F index.csv',na.strings =c('','NA'), stringsAsFactors = F  )
 names(f.index) <- names(f.index) %>% tolower
 wages.long <- wages.long %>% merge(f.index)
 wages.long$f.salary <- as.numeric(wages.long$salary) / wages.long$index * 100
 wages.long <- wages.long[order(wages.long$ID, wages.long$year), ] #order by id and year
 
 ##  Final step: Save this data ----
-save(wages.long, file='Data/Coats May 2018/cleaned long form coats.Rdata')
+save(wages.long, file='Generated data/cleaned long form coats.Rdata')
 
