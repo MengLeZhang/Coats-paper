@@ -43,7 +43,7 @@ wages.long <-
   coats[, c('ID', sel.var)] %>% gather(year, salary, - ID) #wide2long
 
 wages.long <- 
-  wages.long %>% left_join(coats.raw[, -1 * sel.col], by = 'ID') #merge with original to get time invariant data
+  wages.long %>% left_join(coats[, -1 * sel.col], by = 'ID') #merge with original to get time invariant data
 
 wages.long <- 
   wages.long %>%
@@ -70,27 +70,39 @@ cleaned.sal <- 'Cleaned salary values.csv' %>% read.csv
 more.na <- cleaned.sal$Var1 %>% subset(cleaned.sal$is_na == T)
 
 
-### For military enlistment it's a tad more complicated
-more.na
+### For military enlistment it's a tad more complicated -- if they enlisted then
+##  we need to fill the time from their enlisted to 1919 as enlisted to cover the
+##  fact that coats counted military service in tenure
+##  WW1 conscription ended 1919!
 wages.long %>% filter(salary == 'enlisted') # we can see that
 
 ## Enlistment
-test <- 
+wages.long <- 
+##  First part is create a variable that is equal to year if enlisted
   wages.long %>%
-#  group_by(ID) %>%
-  mutate(enlist_year = ifelse(salary == 'enlisted', year, NA)) %>%
+  mutate(enlist_year = 
+           ifelse( (salary == 'enlisted') | (salary == 'Enlisted'), year, 9999)) %>%
+##  Next group by id and select the first year then if the year is after their
+##  enlistment AND NA AND before 1920 then write enlisted
   group_by(ID) %>%
-  mutate(first_year = enlist_year %>% min(na.rm = T),
-         salary.test = ifelse(is.na(salary) & (year > first_year & year < 1920),
-                              'enlisted', salary)) #%>%
-test %>% filter(ID == 33) %>% tail
+  mutate(first_enlist = enlist_year %>% min(na.rm = T), #first enlistment at coats
+#         last_year = year[!is.na(salary) %>% which(.) %>% max(na.rm = T)], #last year of recorded salary or just anything
+         salary = ifelse(is.na(salary) & (year > first_enlist & year < 1920),
+                              'enlisted', salary)) %>%
+  ungroup
+
+warnings() # some never enlisted basically 
+wages.long %>% filter(ID == 33) %>% print.AsIs() # sorted
+wages.long %>% filter(first_enlist < 9999 & year > 1914) %>% print.AsIs() # sorted
+
 
 ##  Then create not.recorded and filter out NA from wages.long
-wages.long$not.recorded <- is.na(wages.long$salary)
+wages.long <- wages.long %>%
+  mutate(not.recorded = salary %>% is.na)
 wages.long$not.recorded[wages.long$salary %in% more.na] <- T
 
 wages.long <- wages.long %>% subset(not.recorded == F) # restrict to only recorded
-wages.long
+
 
 ##  Step five: Sort out issues with commenced and first pay years ----
 ##  Basically for some records their first pay and commencement years are not 
