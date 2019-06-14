@@ -5,10 +5,11 @@
 library(data.table)
 library(tidyverse)
 library(ggplot2)
+library(stargazer)
 
 ##  Step 1) Load in the cleaned data ----
 ##  The object is called wages.long
-load(file='Data/Coats May 2018/cleaned long form coats.Rdata')
+load(file='Generated data/cleaned long form coats.Rdata')
 
 ##  Step 1b) Coding up the periods; creating 10 year tenure bands
 ##  Periods
@@ -34,17 +35,20 @@ wages.long$tenureband2 <- ifelse(wages.long$tenure2 <= 9, '0 - 9',
 ##  accounting for tenure. We need to take into account the random effects
 table(wages.long$tenureband1, wages.long$period)
 ## Female wages only for after 1901
-df.m <- wages.long %>% subset(Location=='Glasgow' & Gender=='M')
-df.f <- wages.long %>% subset(Location=='Glasgow' & Gender=='F' & period != 'x1889 - 1900')
+df.m <- 
+  wages.long %>% subset(Location == 'Glasgow' & Gender == 'M')
+df.f <-
+  wages.long %>% subset(Location == 'Glasgow' &
+                          Gender == 'F' & period != 'x1889 - 1900')
 
 
 ##  Male F test for year given tenure
-mod1am <- lm(f.salary ~ tenure1, df.m)
-mod1bm <- lm(f.salary ~ tenure1 + as.factor(year), df.m)
+mod1am <- 
+  lm(f.salary ~ tenure1, df.m)
+mod1bm <- 
+  lm(f.salary ~ tenure1 + as.factor(year), df.m)
 anova(mod1am, mod1bm) # F ratio test
-mod1bm$coefficients %>% length
-?stargazer
-library(stargazer)
+
 
 mod1cm <- lm(f.salary ~ tenure1 + tenure1*as.factor(year), df.m)
 mod1cm # the heller model
@@ -58,10 +62,10 @@ anova(mod1af, mod1bf) # F ratio test
 anova(mod1af)
 anova(mod1bf)
 
-##  Robustness F tests
-mod2am <- lmer(f.salary ~ (1|ID) + tenure2, df)
-mod2bm <- lmer(f.salary ~ (1|ID) + tenure2 + as.factor(year), df)
-anova(mod2am, mod2bm) # F ratio test
+##  Robustness F tests -- no idea
+# mod2am <- lmer(f.salary ~ (1|ID) + tenure2, df)
+# mod2bm <- lmer(f.salary ~ (1|ID) + tenure2 + as.factor(year), df)
+# anova(mod2am, mod2bm) # F ratio test
 
 
 ##
@@ -71,13 +75,18 @@ regs.tab <- data.frame(year = 1889:1930,
                        slope = NA, slope.se = NA,
                        rsq = NA, n = NA)
 
-heller.regs <- function(df, years = 1889:1930, 
-                        template.tab, 
-                        form = f.salary ~ tenure1){
-    for (i in 1:length(years)){
+heller.regs <- 
+  ##  Function settings
+  function(df,
+           years = 1889:1930,
+           template.tab,
+           form = f.salary ~ tenure1) {
+  ##  Actual block of what function does  
+    for (i in 1:length(years)) {
       tryCatch(
-      mod <- lm(form, df %>% subset(year == (years)[i])),
-      error = function(e){}
+        mod <- lm(form, df %>% subset(year == (years)[i])),
+        error = function(e) {
+        }
       )
       mod.coef <- mod$coefficients
       mod.se <- mod %>% vcov %>% diag
@@ -87,27 +96,38 @@ heller.regs <- function(df, years = 1889:1930,
       
       template.tab$int.se[i] = mod.se[1]
       template.tab$slope.se[i] <- mod.se[2]
-    
+      
       template.tab$n[i] <- mod$fitted.values %>% length
       template.tab$rsq[i] <- summary(mod)$r.squared
     }
-  return(template.tab)
-}
+    return(template.tab)
+  }
 
 
 df.m$tenureband1 %>% table
 
-heller.regs(df.m , template.tab = regs.tab) %>% write.csv('./Results/Whole group regression male.csv')
-heller.regs(df.m %>% subset(tenureband1 == '0 - 9') , template.tab = regs.tab) %>% write.csv('./Results/0 - 9 regression male.csv')
-heller.regs(df.m %>% subset(tenureband1 == '10 - 19') , template.tab = regs.tab) %>% write.csv('./Results/10 - 19 regression male.csv')
-heller.regs(df.m %>% subset(tenureband1 == '20 plus') , template.tab = regs.tab) %>% write.csv('./Results/20 plus regression male.csv') 
+heller.regs(df.m , template.tab = regs.tab) %>% 
+  write.csv('Results/Whole group regression male.csv')
+
+heller.regs(df.m %>% subset(tenureband1 == '0 - 9') , template.tab = regs.tab) %>% 
+  write.csv('Results/0 - 9 regression male.csv')
+heller.regs(df.m %>% subset(tenureband1 == '10 - 19') , template.tab = regs.tab) %>% 
+  write.csv('Results/10 - 19 regression male.csv')
+heller.regs(df.m %>% subset(tenureband1 == '20 plus') , template.tab = regs.tab) %>% 
+  write.csv('Results/20 plus regression male.csv') 
 
 
 ##  Do for feamles post 1900 as well
-female.tab <- data.frame(year = 1901:1930, 
-                       int = NA, int.se = NA,
-                       slope = NA, slope.se = NA,
-                       rsq = NA, n = NA)
+female.tab <- 
+  data.frame(
+    year = 1901:1930,
+    int = NA,
+    int.se = NA,
+    slope = NA,
+    slope.se = NA,
+    rsq = NA,
+    n = NA
+  )
 
 
 heller.regs(df.f , template.tab = female.tab, years = 1901:1930) %>% write.csv('./Results/Whole group regression female.csv')
