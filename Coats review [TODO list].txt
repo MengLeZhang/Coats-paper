@@ -1,0 +1,54 @@
+why not go for a 10 page paper?
+ou may want to look into clerical workers in the publically available New Survey of London Life and Labour. Also Simon Abernathy has compiled a larger data set from the NSLLL which includes the middle class clerks in the NSLLL.
+
+[Hmm would I be willing?]
+
+
+a.      I find the approach to calculating tenure very strange. It is basically the number of occasions in which an individual appears in the books, rather than their actual tenure at specific point in time. The highest salary in a given year is the one that is counted. This means that the date of observation is different for different individuals and that a year of tenure can be anywhere between 1 day and 729 days. Moreover, this figure will differ across different observations. This will inevitably introduce measurement error (the extent of which will depend on the actual distribution of tenure).
+
+(let's try to expand this .... so we can use partial identificaiton right)
+##	Technically we can just used fixed effects right?  
+
+
+b) When examining military leave, on p. 21 you state “Military service counted in relation to tenure and seniority at Coats when enlisted men rejoined the company”. However, on pp. 9-10 what you do when constructing the tenure variable is completely different – “When an individual left the company and later re-joined, their tenure continued from their last employment at Coats.” Why are you counting tenure in a fundamentally different way than Coats’ did at the time? This makes no sense to me.
+
+I did make an error for military ... my mistake -- I'll just do it during the war 1914 and 1919 (last year of conscription) [ DONE]
+
+
+
+Pages 5-6. Very good information is given on employment of males clerks at Coats for the period. However no numbers are given for males as they are for females. Could this please be provided.
+In addition, did Coats follow the practice of employing boy clerks at the age of 14 and then dismissing many of them at the age of 20 as was common in many offices in Britain and did this practice stop with the employment of women? This is extremely important as regards average tenure.
+## Not a clue ^
+##	Can check I suppose
+
+
+c) In figures 2-4 you don’t say anything about what you did with the data to construct comparable figures for Coats and for Seltzer’s work, although on page 10 you note that the estimation methodology is different. A simple inspection of figure 2 suggests that the salaries of middling clerks at Coats’ was very similar to those of the clerical aristocracy at Williams Deacon’s Bank’s norther branches. I find this very surprising and suspect that this “result” may be an artifact of the methodology rather than a genuine finding.
+
+I can write that up [double check this]
+
+d) On p. 6 you state “tracking the earnings of individuals…provides a fuller analysis of the relationship between earnings and job tenure than was previously possible”. First, data in previous studies (almost all of Seltzer’s work on bank clerks) was at the level of the individual, so the extent to which this is novel should be questioned. Second, to what extent is this feature of the data actually used? The regression don’t appear to contain individual fixed effects.
+
+## To be fair that could be legacy wording -- we can do this but is it really worth it?
+
+
+
+
+e)  I don’t understand the logic in not using ln(real salary) in the regressions. Not only is this fairly standard in Mincer wage regressions, it is also directly comparable to the papers that are used as comparisons to the results here.
+
+
+###Not choosing to use the mincerian wage equation in pre data ought to be fine
+##	I should note that this is split in that one paper uses it and the other do not
+
+##	reviwer 2
+n addition, it is highly inappropriate to use data from the First World War to support arguments for an overall general decline. The First World was a singular event, an aberration of extremely high inflation which as the paper quite rightly said had an adverse effect on clerical incomes, which due to their rigid nature, were unable to rapidly adjust to price rises. There is no argument that this had an extremely deleterious effect on clerical income, yet this should not be seen as reinforcing a general overall trend.
+
+ In addition, it shows a rise in tenure adjusted salary during the inflation of the Edwardian period, especially 1905-1914, while Heller and Seltzer’s data shows a decline. If any conclusions can be drawn from this table, it is that in relation to tenure adjusted salary the existing data shows no overall trend, either for the period 1890 to 1914 or for the period 1890 to 1930. This paper would be far stronger if it focused on its own data and what this might tell us about clerical salaries in Coats, in Scotland and the wider North.
+
+## Such a headache -- but it's more substantive rather than what I have to do.
+
+
+--- recast as a piece just about coats --- send it and its fine?!?
+--- tweak it--
+-- number of men and women
+--- time series of male and female staff
+--- send email to mike and update before end of feb.
