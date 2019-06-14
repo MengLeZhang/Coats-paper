@@ -1,16 +1,15 @@
 ##  Plotting results -- intercepts
 
-heller <- './Data/Coats May 2018/Heller 2014 regression table.csv' %>% read.csv(stringsAsFactors = F)
+heller <- 'Raw data/Heller 2014 regression table.csv' %>% read.csv(stringsAsFactors = F)
 heller.int <- heller %>% subset(Var == 'B0') 
 heller.int <- data.frame(year = heller.int$year, inter = heller.int$Overall,
                          source = 'H&K 2014')
 
-seltzer <- './Data/Coats May 2018/Seltzer 2010 tables.csv' %>% read.csv(stringsAsFactors = F)
+seltzer <- 'Raw Data/Seltzer 2010 tables.csv' %>% read.csv(stringsAsFactors = F)
 seltzer$WDB.North <- seltzer$WDB.North %>% substr(1, 5) %>% as.numeric
 seltzer$WDB.London <- seltzer$WDB.London %>% substr(1, 5) %>% as.numeric
 
 seltzer.int_temp <- seltzer %>% subset(Var %in% c('Constant', paste('year', 1890:1935, sep ='')))
-seltzer.int[47, ]
 seltzer.int1 <- data.frame(year = 1890:1935, 
                           inter = (seltzer.int_temp$WDB.North[47] + c(seltzer.int_temp$WDB.North[- 47])) %>% exp,
                           source = 'Seltzer 2010 WDB North')
@@ -19,11 +18,11 @@ seltzer.int2 <- data.frame(year = 1890:1935,
                            source = 'Seltzer 2010 WDB London')
 
 
-tab.male <- './Results/Whole group regression male.csv' %>% read.csv
+tab.male <- 'Results/Whole group regression male.csv' %>% read.csv
 tab.male.int <- data.frame(year = 1889:1930, inter = tab.male$int,
                            source = 'Coats male')
 
-tab.female <- './Results/Whole group regression female.csv' %>% read.csv
+tab.female <- 'Results/Whole group regression female.csv' %>% read.csv
 tab.female <- tab.female %>% subset(n >= 40) # only takes out the first row
 tab.female.int <- data.frame(year = tab.female$year, inter = tab.female$int,
                            source = 'Coats female')
@@ -92,7 +91,7 @@ seltzer.slope15.2 <- data.frame(year = 1890:1935,
 seltzer.slope15.2$inter <- exp(seltzer.slope15.2$inter + seltzer.slope5.temp2 * 15) - exp(seltzer.slope15.2$inter + seltzer.slope5.temp2 * 14)
 
 ##  Heller
-heller <- './Data/Coats May 2018/Heller 2014 regression table.csv' %>% read.csv(stringsAsFactors = F)
+heller <- 'Raw Data/Heller 2014 regression table.csv' %>% read.csv(stringsAsFactors = F)
 heller.slope_temp <- heller[grep('Btenure', heller$Var), ]
 heller.slope5 <- data.frame(year = heller.slope_temp$year, 
                             inter = heller.slope_temp$X0.9.years,
