@@ -1,3 +1,5 @@
+##  Note need to amend re: enlistment which means that there is some odds stuff
+##  going on
 ##  Need to do tables of in and outflows
 ##   Turnover analysis for males
 
@@ -7,7 +9,7 @@ library(ggplot2)
 
 ##  Step 1) Load in the cleaned data ----
 ##  The object is called wages.long
-load(file='Data/Coats May 2018/cleaned long form coats.Rdata')
+load(file='Generated data/cleaned long form coats.Rdata')
 
 ##  Step 2)
 glas.df <- wages.long %>% subset(Location=='Glasgow')
@@ -58,9 +60,6 @@ female.tab$per.in <- female.tab$into / female.tab$total.last
 female.tab$per.out <- female.tab$out / female.tab$total.last
 
 female.tab %>% write.csv('./Results/Turnover female Glasgow.csv')
-female.tab
-
-glas.df %>% subset(Gender == 'F' & year == (1919) & !(ID %in% test))
 
 ##  Convert to long or at least the wierd ggformat
 temp.list1 <- list(NA)
@@ -107,7 +106,4 @@ ggplot(data = all.gg %>% subset(type %in% c('per.in', 'per.out')),
   scale_y_continuous(labels= scales::percent) +
   facet_grid(Gender ~ .) +
   xlab('Year') + ylab('') + ggtitle('Staff turnover of Coats Glasgow office')
-?scale_y_continuous
-?geom_line
-()
 ##
