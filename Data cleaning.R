@@ -4,7 +4,8 @@
 ##  Everyone noted down is presumed to be a clerk as some point of data reporting
 ##  There errors in commencement data caused by genuine errors or missing salary
 ##  book
-##  End goal is to get the data in long form with a tenure variable
+##  End goal is to get the data in long form with a tenure variable for years of
+##  service
 
 ##  Step one: Load in the data and get rid of useless columns ----
 library(tidyverse)
@@ -14,6 +15,7 @@ coats.raw <-
   read.csv(coats.path,
            na.strings = c('', 'NA'),
            stringsAsFactors = F)
+
 summary(coats.raw) # Note the extra col
 coats.raw$X<-NULL #extra no good col
 
@@ -25,8 +27,9 @@ table(coats.raw$Location) #okay this is good although let's just use glasgow for
 
 
 
-##  Step two: Create unique ID; turned commenced into numerical; leave salary as ----
-##  it is
+##  Step two: Create unique ID; turned commenced into numerical ----
+##  Note: leave salary as in this step
+
 coats <- coats.raw %>%
   mutate(ID = 1:nrow(coats.raw), #replacing NA for names with a number
          Commenced = Commenced %>% as.numeric %>% replace_na(9999) ## replace NA with a large positive year
@@ -35,15 +38,18 @@ coats <- coats.raw %>%
 
 
 ##  Step three: Wide to longform ----
+##  Note: The wideform data has one entry per person w/ variables for salary per year
+
 sel.var <- c(paste('X', 1889:1930, sep = '')) #select wideform vars
 sel.col <- which(names(coats.raw) %in% sel.var) # their cols
 
 ##  Make into long form
-wages.long <- 
-  coats[, c('ID', sel.var)] %>% gather(year, salary, - ID) #wide2long
+wages.long <-
+  coats[, c('ID', sel.var)] %>% gather(year, salary,-ID) #wide2long
 
 wages.long <- 
-  wages.long %>% left_join(coats[, -1 * sel.col], by = 'ID') #merge with original to get time invariant data
+  wages.long %>% 
+  left_join(coats[, -1 * sel.col], by = 'ID') #merge with original to get time invariant data
 
 wages.long <- 
   wages.long %>%
@@ -53,6 +59,8 @@ wages.long <-
 wages.long %>% head
 
 ##  Step four: Fixing missingness in salary ----
+
+##  Note: Long read here ###
 ##  Salary currently has non-numerical values such as 'left' which should be NA
 ##  record for that year. It has others such as 'Russia' where basically a person
 ##  was still employed by coats and this record should contribute to tenure.
@@ -66,17 +74,25 @@ wages.long %>% head
 ##  to tenure / salary
 
 ##  Load in data and find index where there is a na value
-cleaned.sal <- 'Cleaned salary values.csv' %>% read.csv
-more.na <- cleaned.sal$Var1 %>% subset(cleaned.sal$is_na == T)
+cleaned.sal <- 
+  'Cleaned salary values.csv' %>% read.csv
+
+more.na <- 
+  cleaned.sal$Var1 %>% 
+  subset(cleaned.sal$is_na == T)
 
 
 ### For military enlistment it's a tad more complicated -- if they enlisted then
 ##  we need to fill the time from their enlisted to 1919 as enlisted to cover the
 ##  fact that coats counted military service in tenure
 ##  WW1 conscription ended 1919!
-wages.long %>% filter(salary == 'enlisted') # we can see that
 
-## Enlistment
+wages.long %>% filter(salary == 'enlisted') # we can see that many enlisted
+
+## 4b) Enlistment -----
+##  We need to 1) get year of first enlistment; 2) entries during enlistment (but 
+##  not first year) are currently NA; 3) we need to fill those entries as NA
+
 wages.long <- 
 ##  First part is create a variable that is equal to year if enlisted
   wages.long %>%
@@ -85,23 +101,28 @@ wages.long <-
 ##  Next group by id and select the first year then if the year is after their
 ##  enlistment AND NA AND before 1920 then write enlisted
   group_by(ID) %>%
-  mutate(first_enlist = enlist_year %>% min(na.rm = T), #first enlistment at coats
+  mutate(first_enlist = enlist_year %>% min(na.rm = T), #first enlistment 
 #         last_year = year[!is.na(salary) %>% which(.) %>% max(na.rm = T)], #last year of recorded salary or just anything
          salary = ifelse(is.na(salary) & (year > first_enlist & year < 1920),
                               'enlisted', salary)) %>%
   ungroup
 
+##  Check errors and known cases with enlistment
 warnings() # some never enlisted basically 
 wages.long %>% filter(ID == 33) %>% print.AsIs() # sorted
 wages.long %>% filter(first_enlist < 9999 & year > 1914) %>% print.AsIs() # sorted
 
 
+##  4c) Get rid of missing salaries 
 ##  Then create not.recorded and filter out NA from wages.long
-wages.long <- wages.long %>%
+wages.long <- 
+  wages.long %>%
   mutate(not.recorded = salary %>% is.na)
+
 wages.long$not.recorded[wages.long$salary %in% more.na] <- T
 
-wages.long <- wages.long %>% subset(not.recorded == F) # restrict to only recorded
+wages.long <- 
+  wages.long %>% subset(not.recorded == F) # restrict to only recorded salaries
 
 
 ##  Step five: Sort out issues with commenced and first pay years ----
@@ -130,7 +151,8 @@ check.begin$diff %>% table # most cases are only 1 or 2 year out which shouldn't
 ##  make too much diff -- some are WAY out;
 
 ##  Create base1 variable
-check.begin$base1 <- ifelse(check.begin$diff <= 0, 0, check.begin$diff) #we did this in the past 
+check.begin$base1 <- 
+  ifelse(check.begin$diff <= 0, 0, check.begin$diff) #we did this in the past 
 
 ##  Base2 variable
 ##  Select those who had a record sal in 1889
@@ -150,8 +172,8 @@ wages.long <-
 ##  counting appearances
 IDs.tab <- aggregate(year ~ ID, wages.long, length)
 count <- list(NULL)
-for (i in 1:nrow(IDs.tab)){
-  count[[i]] <- 0 : (IDs.tab$year[i] - 1)
+for (i in 1:nrow(IDs.tab)) {
+  count[[i]] <- 0:(IDs.tab$year[i] - 1)
 }
 wages.long$tenure.count <- unlist(count)
 wages.long$tenure1 <- wages.long$tenure.count + wages.long$base1
