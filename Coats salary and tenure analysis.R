@@ -16,18 +16,31 @@ load(file='Generated data/cleaned long form coats.Rdata')
 ##  Putting x in front of period to make the last period the reference
 ##  This is for when the model drops rank deficient interactions later
 names(wages.long); head(wages.long)
-wages.long$period <- ifelse(wages.long$year %in% 1889:1900, 'x1889 - 1900',
-                            ifelse(wages.long$year %in% 1901:1913, 'x1901 - 1913',
-                                   ifelse(wages.long$year %in% 1914:1918, 'x1914 - 1918', '1919 - 1930')))
+
+wages.long <-
+  wages.long %>%
+  mutate(period = ifelse(
+    year %in% 1889:1900,
+    'x1889 - 1900',
+    ifelse(
+      year %in% 1901:1913,
+      'x1901 - 1913',
+      ifelse(year %in% 1914:1918, 'x1914 - 1918', '1919 - 1930')
+    )
+  ))
 
 ## Make bands for subsets of tenure
-wages.long$tenureband1 <- ifelse(wages.long$tenure1 <= 9, '0 - 9',
-                                 ifelse(wages.long$tenure1 <= 19, '10 - 19', 
-                                        '20 plus'))
+wages.long <-
+  wages.long %>%
+  mutate(tenureband1 = ifelse(tenure1 <= 9,
+                              '0 - 9',
+                              ifelse(tenure1 <= 19, '10 - 19',
+                                     '20 plus'))) %>%
+  mutate(tenureband2 = ifelse(tenure2 <= 9,
+                              '0 - 9',
+                              ifelse(tenure2 <= 19, '10 - 19',
+                                     '20 plus')))
 
-wages.long$tenureband2 <- ifelse(wages.long$tenure2 <= 9, '0 - 9',
-                                 ifelse(wages.long$tenure2 <= 19, '10 - 19', 
-                                        '20 plus'))
 
 ## We can simply for loop our analysis for women and men
 
@@ -37,9 +50,14 @@ table(wages.long$tenureband1, wages.long$period)
 ## Female wages only for after 1901
 df.m <- 
   wages.long %>% subset(Location == 'Glasgow' & Gender == 'M')
+
 df.f <-
   wages.long %>% subset(Location == 'Glasgow' &
                           Gender == 'F' & period != 'x1889 - 1900')
+
+
+##  2a) The models 
+
 
 
 ##  Male F test for year given tenure
@@ -49,18 +67,24 @@ mod1bm <-
   lm(f.salary ~ tenure1 + as.factor(year), df.m)
 anova(mod1am, mod1bm) # F ratio test
 
+mod1cm <- 
+  lm(log(f.salary) ~ tenure1 + I(tenure1^2), df.m)
+mod1dm <- 
+  lm(log(f.salary) ~ tenure1 + + I(tenure1^2) + as.factor(year), df.m)
+anova(mod1cm, mod1dm) # F ratio test -- still sig
 
-mod1cm <- lm(f.salary ~ tenure1 + tenure1*as.factor(year), df.m)
-mod1cm # the heller model
 
 ##  Female F test for year given tenure
 mod1af <- lm(f.salary ~ tenure1, df.f)
 mod1bf <- lm(f.salary ~ tenure1 + as.factor(year), df.f)
 anova(mod1af, mod1bf) # F ratio test
 
-?anova
-anova(mod1af)
-anova(mod1bf)
+mod1cf <- 
+  lm(log(f.salary) ~ tenure1 + I(tenure1^2), df.f)
+
+mod1df <- 
+  lm(log(f.salary) ~ tenure1 + + I(tenure1^2) + as.factor(year), df.f)
+anova(mod1cf, mod1df) # F ratio test
 
 ##  Robustness F tests -- no idea
 # mod2am <- lmer(f.salary ~ (1|ID) + tenure2, df)
@@ -75,6 +99,7 @@ regs.tab <- data.frame(year = 1889:1930,
                        slope = NA, slope.se = NA,
                        rsq = NA, n = NA)
 
+
 heller.regs <- 
   ##  Function settings
   function(df,
@@ -83,11 +108,13 @@ heller.regs <-
            form = f.salary ~ tenure1) {
   ##  Actual block of what function does  
     for (i in 1:length(years)) {
-      tryCatch(
-        mod <- lm(form, df %>% subset(year == (years)[i])),
-        error = function(e) {
-        }
+      
+      mod <-
+        try(
+        lm(form, df %>% subset(year == (years)[i])), silent = T
       )
+      if(class(mod) == 'try-error')next
+      
       mod.coef <- mod$coefficients
       mod.se <- mod %>% vcov %>% diag
       
@@ -111,8 +138,10 @@ heller.regs(df.m , template.tab = regs.tab) %>%
 
 heller.regs(df.m %>% subset(tenureband1 == '0 - 9') , template.tab = regs.tab) %>% 
   write.csv('Results/0 - 9 regression male.csv')
+
 heller.regs(df.m %>% subset(tenureband1 == '10 - 19') , template.tab = regs.tab) %>% 
   write.csv('Results/10 - 19 regression male.csv')
+
 heller.regs(df.m %>% subset(tenureband1 == '20 plus') , template.tab = regs.tab) %>% 
   write.csv('Results/20 plus regression male.csv') 
 
@@ -148,7 +177,7 @@ mod2bm <- lmer(f.salary ~ (1|ID) + tenure2 + as.factor(year), df)
 anova(mod2am, mod2bm) # F ratio test
 
 ##  Step three: The effects of tenure over time ----
-
+library(lme4)
 
 mod3am <- lmer(f.salary ~ (1|ID) + (1|year) + period + tenureband1 * tenure1, df.m)
 
