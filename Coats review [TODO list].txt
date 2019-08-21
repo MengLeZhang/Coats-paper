@@ -1,7 +1,7 @@
 why not go for a 10 page paper?
 ou may want to look into clerical workers in the publically available New Survey of London Life and Labour. Also Simon Abernathy has compiled a larger data set from the NSLLL which includes the middle class clerks in the NSLLL.
 
-[Hmm would I be willing?]
+[Hmm would I be willing?] NO!
 
 
 a.      I find the approach to calculating tenure very strange. It is basically the number of occasions in which an individual appears in the books, rather than their actual tenure at specific point in time. The highest salary in a given year is the one that is counted. This means that the date of observation is different for different individuals and that a year of tenure can be anywhere between 1 day and 729 days. Moreover, this figure will differ across different observations. This will inevitably introduce measurement error (the extent of which will depend on the actual distribution of tenure).
@@ -10,6 +10,8 @@ a.      I find the approach to calculating tenure very strange. It is basically 
 (let's try to expand this .... so we can use partial identificaiton right)
 ##	Technically we can just used fixed effects right?  
 ##	1 day or 364 -- not 100% sure what they mean -- which we have already addressed in our first reply. 
+
+##	[Done and wrote up]
 
 b) When examining military leave, on p. 21 you state “Military service counted in relation to tenure and seniority at Coats when enlisted men rejoined the company”. However, on pp. 9-10 what you do when constructing the tenure variable is completely different – “When an individual left the company and later re-joined, their tenure continued from their last employment at Coats.” Why are you counting tenure in a fundamentally different way than Coats’ did at the time? This makes no sense to me.
 
@@ -26,6 +28,8 @@ In addition, did Coats follow the practice of employing boy clerks at the age of
 
 c) In figures 2-4 you don’t say anything about what you did with the data to construct comparable figures for Coats and for Seltzer’s work, although on page 10 you note that the estimation methodology is different. A simple inspection of figure 2 suggests that the salaries of middling clerks at Coats’ was very similar to those of the clerical aristocracy at Williams Deacon’s Bank’s norther branches. I find this very surprising and suspect that this “result” may be an artifact of the methodology rather than a genuine finding.
 
+##	I got data from Coats and Selter's paper directly and used the regression formulas that they themselves used to . Since we do n
+
 ##	Seltzer chose to regress on the log whilst Heller and co chose to regress on wages. The differences in their regression technique is telling -- one ensure a regression through the geometric mean whilst the other is just the mean. We chose an identical way of adjusting for tenure as Heller not Seltzer, whether or not this is an artifact of our differing methodologies is unknown. 
 I can write that up [double check this]
 
@@ -40,6 +44,8 @@ d) On p. 6 you state “tracking the earnings of individuals…provides a fuller ana
 e)  I don’t understand the logic in not using ln(real salary) in the regressions. Not only is this fairly standard in Mincer wage regressions, it is also directly comparable to the papers that are used as comparisons to the results here.
 It is directly comparable to Heller's paper and not Seltzers; choosing one or the other would result in lakc of comparison anyway. We err on the size of Heller's methodology due to reasons stated in the paper that fixed tenure increases is in line with our understanding of Coats -- instead of % increases. We note also that the majority of work validating the mincerian wages equation -- which quite rightly is accurate for modern labour economics -- uses data after the second world war where there are significant relationships between human capital, experience and wages. Therefore we do not a priori see the logic in using it. 
 [Done]
+
+##	There is no hope in separating our the tenure and period effects using fixed effects. 
 
 ##	reviwer 2
 n addition, it is highly inappropriate to use data from the First World War to support arguments for an overall general decline. The First World was a singular event, an aberration of extremely high inflation which as the paper quite rightly said had an adverse effect on clerical incomes, which due to their rigid nature, were unable to rapidly adjust to price rises. There is no argument that this had an extremely deleterious effect on clerical income, yet this should not be seen as reinforcing a general overall trend.

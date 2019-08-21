@@ -47,20 +47,28 @@ tab.male.slope15 <- data.frame(year = tab.male.slope15$year,
                               source = 'Coats male 10 - 19 years')
 
 
+## Check obs for paper
+cor(tab.male.slope5$slope, tab.male.slope5$corrected.slope) #correlation is 0.99
+cor(tab.male.slope15$slope, tab.male.slope15$corrected.slope, use = 'complete.obs')
+
+
 ## female
 
 tab.female.slope5 <- './Results/0 - 9 regression female.csv' %>% read.csv
+cor(tab.male.slope5$slope, tab.male.slope5$corrected.slope) #correlation is 0.99
+
 tab.female.slope5 <- tab.female.slope5[- 1, ]
 tab.female.slope5 <- data.frame(year = tab.female.slope5$year, 
                                 inter = tab.female.slope5$slope,
                                 source = 'Coats female 0 - 9 years')
 
 tab.female.slope15 <- './Results/10 - 19 regression female.csv' %>% read.csv
+cor(tab.male.slope15$slope, tab.male.slope15$corrected.slope, use = 'complete.obs')
+
 tab.female.slope15 <- tab.female.slope15[-c(1:15), ]
 tab.female.slope15 <- data.frame(year = tab.female.slope15$year, 
                                  inter = tab.female.slope15$slope,
                                  source = 'Coats female 10 - 19 years')
-
 
 
 ##  Seltzer
