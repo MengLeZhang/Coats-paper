@@ -97,7 +97,8 @@ anova(mod1cf, mod1df) # F ratio test
 regs.tab <- data.frame(year = 1889:1930, 
                        int = NA, int.se = NA,
                        slope = NA, slope.se = NA,
-                       rsq = NA, n = NA)
+                       rsq = NA, n = NA,
+                       lambda = NA, corrected.slope = NA)
 
 
 heller.regs <- 
@@ -105,7 +106,9 @@ heller.regs <-
   function(df,
            years = 1889:1930,
            template.tab,
-           form = f.salary ~ tenure1) {
+           form = f.salary ~ tenure1,
+           var_error = 0.25 # This is the assumed correction factor
+           ) {
   ##  Actual block of what function does  
     for (i in 1:length(years)) {
       
@@ -126,12 +129,14 @@ heller.regs <-
       
       template.tab$n[i] <- mod$fitted.values %>% length
       template.tab$rsq[i] <- summary(mod)$r.squared
+      
+      ## Correction factor to be estimated 
+      est_varX <- mod$model[[2]] %>% var #variance of the first covar
+      template.tab$lambda[i] <- est_varX / (est_varX - 0.25)
+      template.tab$corrected.slope[i] <- template.tab$lambda[i] * template.tab$slope[i]
     }
     return(template.tab)
   }
-
-
-df.m$tenureband1 %>% table
 
 heller.regs(df.m , template.tab = regs.tab) %>% 
   write.csv('Results/Whole group regression male.csv')
@@ -155,14 +160,15 @@ female.tab <-
     slope = NA,
     slope.se = NA,
     rsq = NA,
-    n = NA
+    n = NA,
+    lambda = NA, corrected.slope = NA
   )
 
 
 heller.regs(df.f , template.tab = female.tab, years = 1901:1930) %>% write.csv('./Results/Whole group regression female.csv')
 heller.regs(df.f %>% subset(tenureband1 == '0 - 9'), template.tab = female.tab, years = 1901:1930) %>% write.csv('./Results/0 - 9 regression female.csv')
 heller.regs(df.f %>% subset(tenureband1 == '10 - 19'), template.tab = female.tab, years = 1901:1930) %>% write.csv('./Results/10 - 19 regression female.csv')
-heller.regs(df.f %>% subset(tenureband1 == '20 plus'), template.tab = female.tab, years = 1901:1930)  # so few Ns
+heller.regs(df.f %>% subset(tenureband1 == '20 plus'), template.tab = female.tab, years = 1901:1930)  # so few Ns so not worth it
 
 
 
